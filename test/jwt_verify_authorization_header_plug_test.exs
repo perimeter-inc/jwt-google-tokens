@@ -130,5 +130,7 @@ defmodule JwtVerifyAuthorizationHeaderPlugTest do
     conn = @plug.call(conn, @plug.init([true, 5 * 60]))
 
     claims = conn.assigns[:jwtclaims]
+    assert claims != nil
+    assert claims["name"] == "Alejandro Mezcua"
   end
 end
