@@ -120,4 +120,15 @@ defmodule JwtVerifyAuthorizationHeaderPlugTest do
     assert conn.status == 401
     assert conn.resp_body == ""
   end
+
+  test "supports token header in query params" do
+    TimeUtils.set_time_for_tests()
+    valid_token = @test_header <> "." <> @test_claims <> "." <> @test_signature
+    auth_header = "Bearer " <> valid_token
+
+    conn = conn(:get, "/protected?Authorization=#{auth_header}")
+    conn = @plug.call(conn, @plug.init([true, 5 * 60]))
+
+    claims = conn.assigns[:jwtclaims]
+  end
 end

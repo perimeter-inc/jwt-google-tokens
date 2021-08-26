@@ -22,12 +22,12 @@ defmodule Jwt.Plugs.VerifyAuthorizationHeader do
   end
 
   def call(conn, opts) do
-    Logger.debug(
-      "call. Authorization header: #{inspect(get_req_header(conn, @authorization_header))}"
-    )
+    auth = get_auth(conn)
 
-    List.first(get_req_header(conn, @authorization_header))
-    |> extract_token
+    Logger.debug("Authorization header: #{inspect(auth)}")
+
+    auth
+    |> extract_token()
     |> verify(opts)
     |> continue_after_verification(conn)
   end
@@ -52,5 +52,18 @@ defmodule Jwt.Plugs.VerifyAuthorizationHeader do
     conn
     |> send_resp(401, "")
     |> halt
+  end
+
+  defp get_auth(conn),
+    do: get_auth_from_header(conn) || get_auth_from_query_param(conn)
+
+  defp get_auth_from_header(conn) do
+    req_headers = get_req_header(conn, @authorization_header)
+    if req_headers != [], do: List.first(req_headers), else: nil
+  end
+
+  defp get_auth_from_query_param(conn) do
+    conn = fetch_query_params(conn)
+    Map.get(conn.query_params, "Authorization")
   end
 end
