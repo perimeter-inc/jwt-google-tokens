@@ -13,8 +13,9 @@ defmodule JwtVerifyAuthorizationHeaderPlugTest do
   @test_signature "Kc90u_gtZyhq6glw6UoYQSInZx9r16uqrRO7g50x17JWH7VkyAZrh3sfjdBYpGtDNJjDRBKSxuinpDjpyfiCp3-XAqqOUWqziyYvkV4-CdQvNhcnUQFXjjx_CzNiiEi5PRPCHhX4ajidet1NH4Me02S17gwOZiaZfed1BMWQuQ_7Hf2RsX5FID1xqOpcaaouMFcrqQFmdBIbcstHamWxs9D83c4JpOsioNOMb6-LBinzOg7qdxr1D4NvHD6VSXBTbyXiOBjK2elLU1iCz_Hz_BH-R1IYCdTRr5PczRWdSCgoTdZ7ds1nTTglfuXlGNbaEhhzsFxX8OCR4uNK6vbWXQ"
   # Expiration timestamp for the token avobe
   @test_token_exp_value 1_473_229_464
-  @ten_minutes 10 * 60
   @four_minutes 4 * 60
+  @five_minutes 5 * 60
+  @ten_minutes 10 * 60
 
   test "Missing authorization header returns 401" do
     TimeUtils.set_time_for_tests()
@@ -119,6 +120,20 @@ defmodule JwtVerifyAuthorizationHeaderPlugTest do
     assert conn.state == :sent
     assert conn.status == 401
     assert conn.resp_body == ""
+  end
+
+  test "Token expiration is allowed when the expiration date equals time now" do
+    TimeUtils.set_time_for_tests(@test_token_exp_value - @five_minutes)
+    expired_in_window_token = @test_header <> "." <> @test_claims <> "." <> @test_signature
+    auth_header = "Bearer " <> expired_in_window_token
+
+    conn = conn(:get, "/protected")
+    conn = put_req_header(conn, "authorization", auth_header)
+    conn = @plug.call(conn, @plug.init(@opts))
+
+    claims = conn.assigns[:jwtclaims]
+    assert claims != nil
+    assert claims["name"] == "Alejandro Mezcua"
   end
 
   test "supports token header in query params" do
