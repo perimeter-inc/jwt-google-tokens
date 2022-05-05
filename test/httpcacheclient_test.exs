@@ -4,7 +4,6 @@ defmodule CachingHttpClientTest do
   require Logger
 
   @validtesturl "https://accounts.google.com/.well-known/openid-configuration"
-  @invalidtesturl "https://www.google.com"
   @testcache Jwt.Cache.Ets
 
   setup do
