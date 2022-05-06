@@ -21,7 +21,7 @@ defmodule Jwt.Plugs.Verification do
     cond do
       ignore_token_expiration -> {:ok, claims}
       now > expiration_date -> @expired_token_error
-      now < expiration_date -> {:ok, claims}
+      now <= expiration_date -> {:ok, claims}
     end
   end
 
