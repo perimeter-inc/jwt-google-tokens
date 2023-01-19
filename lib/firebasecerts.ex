@@ -5,7 +5,8 @@ defmodule Jwt.FirebaseCerts.PublicKey do
   def getfor(id), do: fetch(id)
 
   defp fetch(id) do
-    @httpclient.get!(@certs_url)
+    @certs_url
+    |> @httpclient.get!()
     |> get_response_body
     |> extract_public_key_for_id(id)
   end
@@ -18,7 +19,7 @@ defmodule Jwt.FirebaseCerts.PublicKey do
   defp extract_public_key_for_id({:error, _}, _id), do: nil
 
   defp extract_public_key_for_id({:ok, body}, id) do
-    parsed = Jason.decode!(body, %{})
+    parsed = Jason.decode!(body)
 
     cert = parsed[id]
 

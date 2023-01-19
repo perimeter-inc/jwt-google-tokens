@@ -111,7 +111,7 @@ defmodule JwtFilterClaimsPlugTest do
 
   defp build_conn_with_claims() do
     conn = conn(:get, "/protected")
-    Plug.Conn.assign(conn, :jwtclaims, Jason.decode!(Base.url_decode64!(@rawclaims), %{}))
+    Plug.Conn.assign(conn, :jwtclaims, @rawclaims |> Base.url_decode64!() |> Jason.decode!())
   end
 
   defp assert401(conn) do

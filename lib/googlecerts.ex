@@ -26,7 +26,7 @@ defmodule Jwt.GoogleCerts.PublicKey do
     do: {:error, body}
 
   defp extract_certificates_url({:ok, body}) do
-    parsed = Jason.decode!(body, %{})
+    parsed = Jason.decode!(body)
 
     case parsed[@jwt_uri_in_discovery] do
       nil -> {:notfounderror, "No JWT url found"}
@@ -42,7 +42,7 @@ defmodule Jwt.GoogleCerts.PublicKey do
   defp extract_public_key_for_id({:error, _}, _id), do: nil
 
   defp extract_public_key_for_id({:ok, body}, id) do
-    parsed = Jason.decode!(body, %{})
+    parsed = Jason.decode!(body)
 
     key = List.first(Enum.filter(parsed["keys"], fn key -> key["kid"] == id end))
 
