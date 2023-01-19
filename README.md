@@ -78,6 +78,48 @@ The tokens expiration timestamp are also checked to verify that they have not ex
 
 This plug allows you to accept or deny a request based on the contents of the claims. Please take a look at the tests to see the different options you have to filter a request based on the token content.
 
+## Testing
+
+For testing purposes, the package can be configured to accept a given certificate and private key to mock out the Google's, like so:
+
+```elixir
+config :jwt,
+  googlecerts: Jwt.Mockcerts.PublicKey,
+  mock_certificate: """
+  -----BEGIN CERTIFICATE-----
+  certificate contents
+  -----END CERTIFICATE-----
+  """,
+  mock_private_key: """
+  -----BEGIN PRIVATE KEY-----
+  private key contents
+  -----END PRIVATE KEY-----
+  """
+```
+
+Then, during tests setup, simply generate a JWT token signed by this private key, which can then be verified by `Jwt`.
+
+One example using [JSON Web Token library](https://github.com/garyf/json_web_token_ex):
+
+```elixir
+  setup do
+    claims = %{user_id: user_id, exp: exp}
+    private_key = JsonWebToken.Algorithm.RsaUtil.private_key(Jwt.Mockcerts.PublicKey.private_key())
+    {:ok, token} = JsonWebToken.sign(claims, %{alg: "RS256", key: private_key})
+
+    {:ok, %{token: token}}
+  end
+
+  test "my test" do
+    default_options = [
+      Jwt.Plugs.Verification.default_options().ignore_token_expiration,
+      Jwt.Plugs.Verification.default_options().time_window
+    ]
+
+    assert {:ok, claims} = Jwt.Plugs.Verification.verify_token(token, default_options)
+  end
+```
+
 ## License
 
 [Apache v2.0](https://opensource.org/licenses/Apache-2.0)
