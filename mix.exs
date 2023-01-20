@@ -4,7 +4,7 @@ defmodule Jwt.Mixfile do
   def project do
     [
       app: :jwt,
-      version: "0.6.0",
+      version: "0.6.1",
       elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule Jwt.Mixfile do
 
   def application do
     [
-      applications: [:logger, :httpoison, :cowboy, :plug, :timex],
+      extra_applications: [:logger, :httpoison, :cowboy, :plug, :timex],
       mod: {Jwt.Cache.Ets, []},
       env: [plug_cookie_name: "googlejwt"]
     ]
