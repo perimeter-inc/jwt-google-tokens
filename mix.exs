@@ -32,7 +32,6 @@ defmodule Jwt.Mixfile do
       {:ex_doc, only: :dev, runtime: false, github: "elixir-lang/ex_doc"},
       {:cowboy, "~> 2.8"},
       {:plug, "~> 1.10"},
-      {:stash, "~> 1.0"},
       {:timex, "~> 3.6.1"}
     ]
   end
